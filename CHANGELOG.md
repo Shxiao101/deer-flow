@@ -781,6 +781,15 @@ This release closes that milestone with **181 merged pull requests**.
   matched only a literal `http://` prefix. Malformed values now fail fast at
   Gateway startup, matching the documented behavior, and every URL that resolves
   today keeps working. ([#5607])
+- **memory:** Validate Honcho's `allow_insecure_http` as a boolean instead of
+  reading it for truthiness. `AppConfig.resolve_env_variables` substitutes a
+  `$VAR` reference with the raw environment string, so a
+  `allow_insecure_http: $HONCHO_ALLOW_INSECURE` whose variable is `false`
+  reached the backend as `"false"` — and `bool("false")` is `True`, so the
+  config that explicitly declined the opt-in enabled it and sent the API key
+  over plaintext HTTP. The knob now accepts Pydantic's boolean vocabulary
+  (`true`/`t`/`y`/`yes`/`on`/`1` and their false counterparts,
+  case-insensitive) and rejects anything else at config load. ([#5887])
 - **subagents:** Report an explicit zero batch limit by name instead of
   defaulting it. `SubagentBatchService.submit()` resolved `max_live_items` /
   `max_running_items` with `or`, so a caller-supplied `0` read as "not supplied"
@@ -6153,6 +6162,7 @@ with **180 merged pull requests** since the first 2.0 milestone tag.
 [#5879]: https://github.com/bytedance/deer-flow/pull/5879
 [#5881]: https://github.com/bytedance/deer-flow/pull/5881
 [#5884]: https://github.com/bytedance/deer-flow/pull/5884
+[#5887]: https://github.com/bytedance/deer-flow/pull/5887
 [#5893]: https://github.com/bytedance/deer-flow/pull/5893
 [#5900]: https://github.com/bytedance/deer-flow/pull/5900
 [#5928]: https://github.com/bytedance/deer-flow/pull/5928

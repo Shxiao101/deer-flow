@@ -749,6 +749,13 @@
   `http://` 前缀。现在格式错误的值会在 Gateway 启动时快速失败，
   与文档声明的行为一致；而今天能够解析的每一个 URL 都继续照常
   工作。([#5607])
+- **记忆：** 将 Honcho 的 `allow_insecure_http` 按布尔值校验，而不是按真值
+  读取。`AppConfig.resolve_env_variables` 会用原始环境字符串替换 `$VAR`，
+  因此 `allow_insecure_http: $HONCHO_ALLOW_INSECURE` 在变量为 `false` 时以
+  `"false"` 到达后端——而 `bool("false")` 为 `True`，于是明确拒绝该开关的
+  配置反而开启了它，API key 被以明文 HTTP 发送。该旋钮现在接受 Pydantic 的
+  布尔词表（`true`/`t`/`y`/`yes`/`on`/`1` 及其对应的假值，大小写不敏感），
+  其它值在加载配置时即被拒绝。([#5887])
 - **子智能体：** 显式为 0 的批量上限现在按名字上报，
   而不再替换为默认值。`SubagentBatchService.submit()` 此前
   用 `or` 解析 `max_live_items` / `max_running_items`，
@@ -5229,6 +5236,7 @@ DeerFlow 2.0 是围绕"超级智能体"框架的彻底重写，核心包含子�
 [#5879]: https://github.com/bytedance/deer-flow/pull/5879
 [#5881]: https://github.com/bytedance/deer-flow/pull/5881
 [#5884]: https://github.com/bytedance/deer-flow/pull/5884
+[#5887]: https://github.com/bytedance/deer-flow/pull/5887
 [#5893]: https://github.com/bytedance/deer-flow/pull/5893
 [#5900]: https://github.com/bytedance/deer-flow/pull/5900
 [#5928]: https://github.com/bytedance/deer-flow/pull/5928
